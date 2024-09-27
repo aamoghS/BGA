@@ -30,7 +30,28 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Example Data Rows -->
+                        <tr>
+                            <td>Atlanta Hawks</td>
+                            <td>Away</td>
+                            <td>1:31</td>
+                            <td>Landed</td>
+                            <td>ATL / MDW</td>
+                            <td>04/16/24</td>
+                            <td>03:04 PM CDT</td>
+                            <td>29.43</td>
+                            <td>-2.5</td>
+                            <td>04/17/24</td>
+                            <td>9:30 pm</td>
+                            <td>Chicago Bulls</td>
+                            <td>2:17</td>
+                            <td>Landed</td>
+                            <td>04/14/24</td>
+                            <td>06:02 PM CDT</td>
+                            <td>EWR / ORD</td>
+                            <td>74.47</td>
+                            <td>-2.5</td>
+                        </tr>
+                        <!-- More rows for each team -->
                     </tbody>
                 </table>
             </div>
@@ -42,7 +63,7 @@
 
 <script>
 window.onload = function() {
-    var table = document.getElementById("sportFlights"); // Replace with your table's ID
+    var table = document.getElementById("sportFlights");
     var headers = table.getElementsByTagName("th");
     
     // Attach click event to each header for sorting
@@ -74,7 +95,7 @@ function parseTime(timeStr) {
     return hours * 60 + minutes;
 }
 
-// Convert date to Date object for comparison
+// Function to parse date from MM/DD/YY format
 function parseDate(dateStr) {
     var parts = dateStr.split('/');
     return new Date(parseInt(parts[2], 10) + 2000, parseInt(parts[0], 10) - 1, parseInt(parts[1], 10));
@@ -163,7 +184,7 @@ function toggleColumns() {
 // Helper function to hide opponent columns
 function hideOpponentColumns() {
     var table = document.getElementById("sportFlights");
-    for (var i = 12; i <= 19; i++) {
+    for (var i = 11; i <= 18; i++) {
         var cols = table.querySelectorAll('th:nth-child(' + i + '), td:nth-child(' + i + ')');
         cols.forEach(function(col) {
             col.classList.add('hidden-column');
@@ -174,7 +195,7 @@ function hideOpponentColumns() {
 // Helper function to show opponent columns
 function showOpponentColumns() {
     var table = document.getElementById("sportFlights");
-    for (var i = 12; i <= 19; i++) {
+    for (var i = 11; i <= 18; i++) {
         var cols = table.querySelectorAll('th:nth-child(' + i + '), td:nth-child(' + i + ')');
         cols.forEach(function(col) {
             col.classList.remove('hidden-column');
