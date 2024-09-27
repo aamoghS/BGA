@@ -1,0 +1,190 @@
+<div class="background-layer">
+    <div class="container center-form">
+        <h3>NBA Team Flights</h3>
+        <small>Data that tracks the location of NBA team flights including charter and private airplanes, updated hourly</small>
+        <p>Last Updated: 04:00 PM EST </p>
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="dataframe table table-striped" id="sportFlights">
+                    <thead>
+                        <tr style="text-align: right;">
+                            <th>Team</th>
+                            <th>Home/ Away</th>
+                            <th>Flight Time</th>
+                            <th>Flight Status</th>
+                            <th>Airports</th>
+                            <th>Arrival Date</th>
+                            <th>Arrival Time</th>
+                            <th>Hours After Arrival</th>
+                            <th>Hours Since Last Game</th>
+                            <th>Game Day</th>
+                            <th>Game Time (EST)</th>
+                            <th>Opponent</th>
+                            <th>Opponent Flight Time</th>
+                            <th>Opponent Flight Status</th>
+                            <th>Opponent Arrival Date</th>
+                            <th>Opponent Arrival Time</th>
+                            <th>Opponent Airports</th>
+                            <th>Opponent Hours After Arrival</th>
+                            <th>Opponent Hours Since Last Game</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Example Data Rows -->
+                    </tbody>
+                </table>
+            </div>
+            <button class="expand-collapse-btn" onclick="toggleColumns()">Expand to view opponent info</button>
+        </div>
+    </div>
+    <br>
+</div>
+
+<script>
+window.onload = function() {
+    var table = document.getElementById("sportFlights"); // Replace with your table's ID
+    var headers = table.getElementsByTagName("th");
+    
+    // Attach click event to each header for sorting
+    for (var i = 0; i < headers.length; i++) {
+        (function(n) {
+            headers[i].addEventListener("click", function() {
+                sortTable(n);
+            });
+        })(i);
+    }
+    
+    // Initially hide opponent-related columns
+    hideOpponentColumns();
+};
+
+// Function to convert time to minutes since midnight
+function parseTime(timeStr) {
+    var time = timeStr.match(/(\d+):(\d+) (\w+)/);
+    var hours = parseInt(time[1], 10);
+    var minutes = parseInt(time[2], 10);
+    var meridian = time[3].toLowerCase();
+
+    if (meridian === 'pm' && hours < 12) {
+        hours += 12;
+    } else if (meridian === 'am' && hours === 12) {
+        hours = 0;
+    }
+
+    return hours * 60 + minutes;
+}
+
+// Convert date to Date object for comparison
+function parseDate(dateStr) {
+    var parts = dateStr.split('/');
+    return new Date(parseInt(parts[2], 10) + 2000, parseInt(parts[0], 10) - 1, parseInt(parts[1], 10));
+}
+
+// Function to parse HH:MM time format into minutes
+function parseHourMinute(timeStr) {
+    var parts = timeStr.split(':');
+    return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+}
+
+// Function to sort the table based on the clicked column
+function sortTable(n) {
+    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById("sportFlights");
+    switching = true;
+    dir = "asc"; 
+
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+
+        for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[n].innerHTML.toLowerCase();
+            y = rows[i + 1].getElementsByTagName("TD")[n].innerHTML.toLowerCase();
+
+            var xVal, yVal;
+            if (/(\d+):(\d+) (AM|PM)/i.test(x) && /(\d+):(\d+) (AM|PM)/i.test(y)) {
+                xVal = parseTime(x);
+                yVal = parseTime(y);
+            } else if (/^\d{1,2}\/\d{1,2}\/\d{2}$/.test(x) && /^\d{1,2}\/\d{1,2}\/\d{2}$/.test(y)) {
+                xVal = parseDate(x);
+                yVal = parseDate(y);
+            } else if (/^\d{1,2}:\d{2}$/.test(x) && /^\d{1,2}:\d{2}$/.test(y)) {
+                xVal = parseHourMinute(x);
+                yVal = parseHourMinute(y);
+            } else if (!isNaN(parseFloat(x)) && !isNaN(parseFloat(y))) {
+                xVal = parseFloat(x);
+                yVal = parseFloat(y);
+            } else {
+                xVal = x;
+                yVal = y;
+            }
+
+            if (dir == "asc") {
+                if (xVal > yVal) {
+                    shouldSwitch = true;
+                    break;
+                }
+            } else if (dir == "desc") {
+                if (xVal < yVal) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+        }
+        
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchcount++;
+        } else {
+            if (switchcount == 0 && dir == "asc") {
+                dir = "desc";
+                switching = true;
+            }
+        }
+    }
+}
+
+// Function to toggle opponent columns visibility
+function toggleColumns() {
+    var button = document.querySelector('.expand-collapse-btn');
+    var isExpanded = button.innerHTML.includes("Collapse");
+
+    if (isExpanded) {
+        hideOpponentColumns();
+        button.innerHTML = 'Expand to view opponent info';
+    } else {
+        showOpponentColumns();
+        button.innerHTML = 'Collapse';
+    }
+}
+
+// Helper function to hide opponent columns
+function hideOpponentColumns() {
+    var table = document.getElementById("sportFlights");
+    for (var i = 12; i <= 19; i++) {
+        var cols = table.querySelectorAll('th:nth-child(' + i + '), td:nth-child(' + i + ')');
+        cols.forEach(function(col) {
+            col.classList.add('hidden-column');
+        });
+    }
+}
+
+// Helper function to show opponent columns
+function showOpponentColumns() {
+    var table = document.getElementById("sportFlights");
+    for (var i = 12; i <= 19; i++) {
+        var cols = table.querySelectorAll('th:nth-child(' + i + '), td:nth-child(' + i + ')');
+        cols.forEach(function(col) {
+            col.classList.remove('hidden-column');
+        });
+    }
+}
+</script>
+
+<style>
+.hidden-column {
+    display: none;
+}
+</style>
